@@ -1,2 +1,2 @@
-# dsa-c
+# dsa
 Some data structures and algorithms implementation
