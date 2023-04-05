@@ -1,15 +1,15 @@
 package kijko.dsa;
 
-import java.util.LinkedList;
 import java.util.Objects;
 import java.util.Optional;
 
 class SimpleHashTable<K, V> implements HashTable<K, V> {
-    private final int bucketCount = 4; // >= 2
-    private final LinkedList<Bucket<K, V>> buckets;
+    private static final Integer DEFAULT_BUCKET_COUNT = 4; // >= 2
+    private final List<Bucket<K, V>> buckets;
 
     public SimpleHashTable() {
-        this.buckets = new LinkedList<>();
+        int bucketCount = DEFAULT_BUCKET_COUNT;
+        this.buckets = new SimpleLinkedList<>();
 
         long fullRangeLength = Integer.MAX_VALUE * 2L;
         long bucketRangeLength = fullRangeLength / bucketCount;
@@ -17,7 +17,7 @@ class SimpleHashTable<K, V> implements HashTable<K, V> {
         long bucketRangeStart = Integer.MIN_VALUE;
         for (int i = 0; i < bucketCount; i++) {
             long bucketRangeEnd = bucketRangeStart + bucketRangeLength;
-            this.buckets.add(new Bucket<>(new BucketRange(bucketRangeStart, bucketRangeEnd), new LinkedList<>()));
+            this.buckets.add(new Bucket<>(new BucketRange(bucketRangeStart, bucketRangeEnd), new SimpleLinkedList<>()));
 
             bucketRangeStart = bucketRangeEnd;
         }
@@ -52,7 +52,7 @@ class SimpleHashTable<K, V> implements HashTable<K, V> {
         return bucket.get(key).map(BucketEntry::value);
     }
 
-    private record Bucket<K, V>(BucketRange range, LinkedList<BucketEntry<K, V>> elems) { // todo create no duplicates linked list
+    private record Bucket<K, V>(BucketRange range, List<BucketEntry<K, V>> elems) { // todo create no duplicates linked list
         private boolean inRange(int num) {
             return num < range.to && num >= range.from;
         }
@@ -69,13 +69,13 @@ class SimpleHashTable<K, V> implements HashTable<K, V> {
         }
 
         private Optional<BucketEntry<K, V>> get(K key) {
-            int index = elems.indexOf(new BucketEntry<K, V>(key, null));
+            int index = elems.indexOf(new BucketEntry<>(key, null));
 
-            return index == -1 ? Optional.empty() : Optional.of(elems.get(index));
+            return index == -1 ? Optional.empty() : elems.get(index);
         }
 
         private void remove(K key) {
-            elems.remove(new BucketEntry<K, V>(key, null));
+            elems.remove(new BucketEntry<>(key, null));
         }
     }
     private record BucketRange(long from, long to) {} //from - inclusive, to -exclusive
