@@ -14,4 +14,5 @@ interface List<T> extends Iterable<T> {
     void remove(T obj);
 
     boolean isEmpty();
+    int size();
 }

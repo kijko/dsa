@@ -123,6 +123,11 @@ class SimpleLinkedList<T> implements List<T> {
     }
 
     @Override
+    public int size() {
+        return this.size;
+    }
+
+    @Override
     public Iterator<T> iterator() {
         return new SimpleLinkedListIterator<>(this);
     }
